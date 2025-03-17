@@ -27,17 +27,26 @@ export default function Home() {
   const [showAddTagModal, setShowAddTagModal] = useState(false);
 
   useEffect(() => {
-    const storedTotal = retrieveFromLocalStorage<number>("total");
-    if (storedTotal) {
-      setTotal(storedTotal);
-    }
-    const storedTags = retrieveFromLocalStorage<string[]>("tags");
-    if (storedTags) {
-      setTags(storedTags);
-    }
+    const updateStateFromLocalStorage = () => {
+      const storedTotal = retrieveFromLocalStorage<number>("total");
+      if (storedTotal) {
+        setTotal(storedTotal);
+      }
+      const storedTags = retrieveFromLocalStorage<string[]>("tags");
+      if (storedTags) {
+        setTags(storedTags);
+      }
+    };
+
+    updateStateFromLocalStorage();
+
+    window.addEventListener("storage", updateStateFromLocalStorage);
+    return () => {
+      window.removeEventListener("storage", updateStateFromLocalStorage);
+    };
   }, []);
 
-  function AddTagModal(){
+  function AddTagModal() {
     const [tagName, setTagName] = useState("");
     const handleAddTag = () => {
       if (tagName.trim() !== "") {
@@ -51,15 +60,26 @@ export default function Home() {
         setShowAddTagModal(false);
       }
     };
-    return(
+    return (
       <div className="absolute h-full w-full bg-gray-800/90 flex justify-center items-center">
         <div className="w-5/6 flex justify-center items-center flex-col text-[#41644A] bg-[#ADA991] p-4 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-4">Add a new tag</h2>
+          <div className="flex justify-between items-center w-full mb-4 px-2">
+            <h2 className="text-xl font-bold">Add a new tag</h2>
+            <button
+              className="bg-[#41644A] text-white py-1.5 text-xl px-3 rounded-xl font-light tracking-wider"
+              onClick={() => setShowAddTagModal(false)}
+            >
+              X
+            </button>
+          </div>
           <input
+            autoFocus
             type="text"
             value={tagName.toUpperCase()}
             onChange={(e) => setTagName(e.target.value)}
-            onKeyDown={(e) => {if (e.key === "Enter") handleAddTag()}}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAddTag();
+            }}
             placeholder="Tag name"
             className="bg-white outline-[#41644A] border border-gray-300 rounded-lg px-4 py-2 mb-4 w-full"
           />
@@ -71,17 +91,30 @@ export default function Home() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   const handleAdd = () => {
+    if (!selectedTag) alert("Please select a tag");
     const parsedAmount = parseFloat(amount);
-    if (!isNaN(parsedAmount)) {
+    if (!isNaN(parsedAmount) && selectedTag) {
       const newTotal = total + parsedAmount;
       setTotal(newTotal);
       storeToLocalStorage("total", newTotal);
+
+      const transaction = {
+        tag: selectedTag,
+        amount: parsedAmount,
+        date: new Date().toISOString(),
+      };
+
+      const storedTransactions =
+        retrieveFromLocalStorage<any[]>("transactions") || [];
+      const updatedTransactions = [...storedTransactions, transaction];
+      storeToLocalStorage("transactions", updatedTransactions);
     }
     setAmount("");
+    setSelectedTag(null);
   };
   useEffect(() => console.log(selectedTag), [selectedTag]);
   return (
@@ -91,7 +124,7 @@ export default function Home() {
         <div className="h-40 bg-[#FFA725] rounded-4xl m-4 text-black font-semibold flex justify-center items-center text-5xl font-serif">
           <span>Total: {total ? total : "N.A."}</span>
         </div>
-        <div className="pt-4">
+        <div className="pt-10 px-4">
           <div className="text-lg font-medium">Select a tag:</div>
           <div className="flex flex-wrap space-y-2 space-x-2 mt-2">
             {tags.map((tag) => (
@@ -106,14 +139,14 @@ export default function Home() {
               </button>
             ))}
             <button
-              className="bg-[#FFA725] py- px-4 rounded-xl font-semibold border-4 "
+              className="bg-[#FFA725] py- px-4 rounded-xl font-semibold border-4 boreder-[#FFA725] tracking-wider"
               onClick={() => setShowAddTagModal(true)}
             >
               +
             </button>
           </div>
         </div>
-        <div className="pt-10 text-xl px-4 space-y-2">
+        <div className="pt-4 text-xl px-4 space-y-2">
           <div>Enter amount to add:</div>
           <div className="flex space-x-2">
             <input
