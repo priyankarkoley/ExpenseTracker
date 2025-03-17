@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function storeToLocalStorage(key: string, value: any) {
@@ -116,14 +117,17 @@ export default function Home() {
     setAmount("");
     setSelectedTag(null);
   };
-  useEffect(() => console.log(selectedTag), [selectedTag]);
+
   return (
     <div>
       {showAddTagModal && <AddTagModal />}
-      <div className="p-4">
+      <div className="p-4 space-y-4">
+        {/* TOTAL */}
         <div className="h-40 bg-[#FFA725] rounded-4xl m-4 text-black font-semibold flex justify-center items-center text-5xl font-serif">
           <span>Total: {total ? total : "N.A."}</span>
         </div>
+
+        {/* ADD TAG */}
         <div className="pt-10 px-4">
           <div className="text-lg font-medium">Select a tag:</div>
           <div className="flex flex-wrap space-y-2 space-x-2 mt-2">
@@ -146,6 +150,8 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* ADD AMOUNT */}
         <div className="pt-4 text-xl px-4 space-y-2">
           <div>Enter amount to add:</div>
           <div className="flex space-x-2">
@@ -169,6 +175,14 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* TRANSACTIONS HISTORY*/}
+          <Link
+            href="/transactions"
+            className="flex items-center justify-center mx-4 mt-10 bg-[#41644A] py-3.5 px-4 text-xl rounded-xl font-semibold tracking-wider"
+            >
+            <div>OPEN DETAILED VIEW</div>
+          </Link>
       </div>
     </div>
   );
