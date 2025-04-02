@@ -4,32 +4,31 @@ import { retrieveFromLocalStorage } from '@/utils/localStorage';
 import Link from 'next/link';
 
 interface TransactionType {
-  tag: string;
-  description: string;
-  amount: number;
-  date: string;
+	tag: string;
+	description: string;
+	amount: number;
+	date: string;
 }
 
 export default function Transactions() {
-  const [tagTotals, setTagTotals] = useState<{ [key: string]: number }>({});
+	const [tagTotals, setTagTotals] = useState<{ [key: string]: number }>({});
 
-  useEffect(() => {
-    const storedTransactions =
-      retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
-    const totals: { [key: string]: number } = {};
+	useEffect(() => {
+		const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
+		const totals: { [key: string]: number } = {};
 
-    storedTransactions.forEach((transaction) => {
-      if (!totals[transaction.tag]) {
-        totals[transaction.tag] = 0;
-      }
-      totals[transaction.tag] += transaction.amount;
-    });
+		storedTransactions.forEach(transaction => {
+			if (!totals[transaction.tag]) {
+				totals[transaction.tag] = 0;
+			}
+			totals[transaction.tag] += transaction.amount;
+		});
 
-    setTagTotals(totals);
-  }, []);
+		setTagTotals(totals);
+	}, []);
 
-  return (
-		<div className="flex h-[calc(88vh)] flex-col justify-between pt-8 px-7 pb-4">
+	return (
+		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="space-y-4">
 				<div className="text-center text-3xl font-bold text-[#41644A]">Tag-wise Expenditure</div>
 				<div className="space-y-4 py-4">
