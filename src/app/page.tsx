@@ -20,6 +20,13 @@ function retrieveFromLocalStorage<T>(key: string): T | null {
   }
 }
 
+interface TransactionType{
+  tag: string;
+  description: string;
+  amount: number;
+  date: string;
+}
+
 export default function Home() {
   const [amount, setAmount] = useState<string>(""); // Initialize as an empty string
   const [tags, setTags] = useState<string[]>([]);
@@ -96,21 +103,25 @@ export default function Home() {
   }
 
   const handleAdd = () => {
-    if (!selectedTag) alert("Please select a tag");
+    if (!selectedTag) {
+      alert("Please select a tag");
+      return;
+    }
     const parsedAmount = parseFloat(amount);
     if (!isNaN(parsedAmount) && selectedTag) {
       const newTotal = total + parsedAmount;
       setTotal(newTotal);
       storeToLocalStorage("total", newTotal);
 
-      const transaction = {
+      const transaction: TransactionType = {
         tag: selectedTag,
+        description: '',
         amount: parsedAmount,
         date: new Date().toISOString(),
       };
 
       const storedTransactions =
-        retrieveFromLocalStorage<any[]>("transactions") || [];
+        retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
       const updatedTransactions = [...storedTransactions, transaction];
       storeToLocalStorage("transactions", updatedTransactions);
     }
