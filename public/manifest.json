@@ -1,7 +1,7 @@
 {
 	"name": "Expense Tracker",
 	"short_name": "Tracker",
-	"theme_color": "#00ff00",
+	"theme_color": "#2b2b2b",
 	"background_color": "#ffffff",
 	"display": "browser",
 	"orientation": "any",
