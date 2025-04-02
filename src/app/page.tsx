@@ -1,25 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-function storeToLocalStorage(key: string, value: any) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error("Error storing to localStorage", error);
-  }
-}
-
-function retrieveFromLocalStorage<T>(key: string): T | null {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? (JSON.parse(item) as T) : null;
-  } catch (error) {
-    console.error("Error retrieving from localStorage", error);
-    return null;
-  }
-}
-
+import { retrieveFromLocalStorage, storeToLocalStorage } from "@/utils/localStorage";
 interface TransactionType{
   tag: string;
   description: string;
@@ -130,22 +112,23 @@ export default function Home() {
   };
 
   return (
-    <div>
-      {showAddTagModal && <AddTagModal />}
-      <div className="p-4 space-y-4">
+		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
+			{showAddTagModal && <AddTagModal />}
+      <div className="space-y-4">
         {/* TOTAL */}
-        <div className="h-40 bg-[#FFA725] rounded-4xl m-4 text-black font-semibold flex justify-center items-center text-5xl font-serif">
-          <span>Total: {total ? total : "N.A."}</span>
+        <div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
+          <span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total : 'N.A.'}
         </div>
-
         {/* ADD TAG */}
-        <div className="pt-10 px-4">
+        <div className="px-4 pt-10">
           <div className="text-lg font-medium">Select a tag:</div>
-          <div className="flex flex-wrap space-y-2 space-x-2 mt-2">
-            {tags.map((tag) => (
+          <div className="mt-2 flex flex-wrap space-y-2 space-x-2">
+            {tags.map(tag => (
               <button
                 key={tag}
-                className={`bg-[#FFA725] py-2 px-4 rounded-xl font-semibold tracking-wider border-4 ${selectedTag === tag ? "border-blue-600" : "border-[#FFA725]"}`}
+                className={`rounded-xl border-4 bg-[#FFA725] px-4 py-2 font-semibold tracking-wider ${
+                  selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
+                }`}
                 onClick={() => {
                   setSelectedTag(tag);
                 }}
@@ -154,16 +137,15 @@ export default function Home() {
               </button>
             ))}
             <button
-              className="bg-[#FFA725] py- px-4 rounded-xl font-semibold border-4 boreder-[#FFA725] tracking-wider"
+              className="py- boreder-[#FFA725] rounded-xl border-4 bg-[#FFA725] px-4 font-semibold tracking-wider"
               onClick={() => setShowAddTagModal(true)}
             >
               +
             </button>
           </div>
         </div>
-
         {/* ADD AMOUNT */}
-        <div className="pt-4 text-xl px-4 space-y-2">
+        <div className="space-y-2 px-4 pt-4 text-xl">
           <div>Enter amount to add:</div>
           <div className="flex space-x-2">
             <input
@@ -172,29 +154,26 @@ export default function Home() {
               inputMode="numeric"
               value={amount}
               min={0}
-              onChange={(e) => setAmount(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAdd();
+              onChange={e => setAmount(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleAdd();
               }}
-              className="w-full px-4 text-2xl outline-none rounded-xl bg-white text-[#0D4715] p-2"
+              className="w-full rounded-xl bg-white p-2 px-4 text-2xl text-[#0D4715] outline-none"
             />
-            <button
-              onClick={handleAdd}
-              className="bg-[#41644A] py-3.5 px-4 rounded-xl font-semibold tracking-wider"
-            >
+            <button onClick={handleAdd} className="rounded-xl bg-[#41644A] px-4 py-3.5 font-semibold tracking-wider">
               ADD
             </button>
           </div>
         </div>
-
-        {/* TRANSACTIONS HISTORY*/}
-          <Link
-            href="/transactions"
-            className="flex items-center justify-center mx-4 mt-10 bg-[#41644A] py-3.5 px-4 text-xl rounded-xl font-semibold tracking-wider"
-            >
-            <div>OPEN DETAILED VIEW</div>
-          </Link>
       </div>
-    </div>
-  );
+
+      {/* TRANSACTIONS HISTORY*/}
+			<Link
+				href="/transactions"
+				className="mt-10 rounded-xl bg-[#41644A] py-3.5 text-center font-semibold tracking-wider"
+			>
+				OPEN DETAILED VIEW
+			</Link>
+		</div>
+	);
 }
