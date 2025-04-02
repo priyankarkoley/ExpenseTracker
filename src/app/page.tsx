@@ -110,7 +110,7 @@ export default function Home() {
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			{showAddTagModal && <AddTagModal />}
-			<div className="space-y-4">
+			<div className="h-[calc(88vh -.875rem)] space-y-4 overflow-y-auto">
 				{/* TOTAL */}
 				<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
 					<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total : 'N.A.'}
@@ -118,7 +118,7 @@ export default function Home() {
 				{/* ADD TAG */}
 				<div className="px-4 pt-10">
 					<div className="text-lg font-medium">Select a tag:</div>
-					<div className="mt-2 flex flex-wrap space-y-2 space-x-2">
+					<div className="mt-2 flex space-x-2 overflow-x-auto">
 						{tags.map(tag => (
 							<button
 								key={tag}
@@ -133,7 +133,7 @@ export default function Home() {
 							</button>
 						))}
 						<button
-							className="py- boreder-[#FFA725] rounded-xl border-4 bg-[#FFA725] px-4 font-semibold tracking-wider"
+							className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
 							onClick={() => setShowAddTagModal(true)}
 						>
 							+
