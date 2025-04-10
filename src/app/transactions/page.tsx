@@ -96,12 +96,21 @@ export default function Transactions() {
 					</div>
 				</div>
 			</div>
-			<Link
-				href="/"
-				className="mt-4 rounded-xl bg-[#41644A] py-3.5 text-center font-semibold tracking-wider text-white shadow-lg"
-			>
-				HOME
-			</Link>
+			<div className="mt-4 flex space-x-4 font-semibold tracking-wider text-white shadow-lg">
+				<button
+					onClick={() => {
+						localStorage.clear();
+						setTagTotals({});
+						setRecentTransactions([]);
+					}}
+					className="w-full rounded-xl bg-[#932323] py-3.5 text-center"
+				>
+					DELETE
+				</button>
+				<Link href="/" className="w-full rounded-xl bg-[#41644A] py-3.5 text-center">
+					HOME
+				</Link>
+			</div>
 		</div>
 	);
 }
