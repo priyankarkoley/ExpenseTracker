@@ -18,10 +18,20 @@ export default function Home() {
 
 	useEffect(() => {
 		const updateStateFromLocalStorage = () => {
-			const storedTotal = retrieveFromLocalStorage<number>('total');
-			if (storedTotal) {
-				setTotal(storedTotal);
-			}
+			const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
+			const currentMonth = new Date().getMonth();
+			const currentYear = new Date().getFullYear();
+
+			// Filter transactions for the current month and year
+			const currentMonthTransactions = storedTransactions.filter(transaction => {
+				const transactionDate = new Date(transaction.date);
+				return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
+			});
+
+			// Calculate the total for the current month
+			const currentMonthTotal = currentMonthTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+			setTotal(currentMonthTotal);
+
 			const storedTags = retrieveFromLocalStorage<string[]>('tags');
 			if (storedTags) {
 				setTags(storedTags);
@@ -90,8 +100,6 @@ export default function Home() {
 		if (!isNaN(parsedAmount) && selectedTag) {
 			const newTotal = total + parsedAmount;
 			setTotal(newTotal);
-			storeToLocalStorage('total', newTotal);
-
 			const transaction: TransactionType = {
 				tag: selectedTag,
 				description: '',
