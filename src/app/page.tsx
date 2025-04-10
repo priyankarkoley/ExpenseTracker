@@ -121,7 +121,7 @@ export default function Home() {
 			<div className="h-[calc(88vh -.875rem)] space-y-4 overflow-y-auto">
 				{/* TOTAL */}
 				<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
-					<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total : 'N.A.'}
+					<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
 				</div>
 				{/* ADD TAG */}
 				<div className="px-4 pt-10">
@@ -155,7 +155,7 @@ export default function Home() {
 						<input
 							autoFocus
 							type="number"
-							inputMode="numeric"
+							inputMode="decimal"
 							value={amount}
 							min={0}
 							onChange={e => setAmount(e.target.value)}
