@@ -49,24 +49,20 @@ export default function Transactions() {
 	useEffect(() => {
 		const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
 		const totals: { [key: string]: number } = {};
+		const currentMonth = new Date().getMonth();
+		const currentYear = new Date().getFullYear();
 
 		storedTransactions.forEach(transaction => {
-			if (!totals[transaction.tag]) {
-				totals[transaction.tag] = 0;
+			const transactionDate = new Date(transaction.date);
+			if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
+				if (!totals[transaction.tag]) {
+					totals[transaction.tag] = 0;
+				}
+				totals[transaction.tag] += transaction.amount;
 			}
-			totals[transaction.tag] += transaction.amount;
 		});
 
 		setTagTotals(totals);
-
-		// Filter transactions for the current month
-		const currentDate = new Date();
-		const currentMonth = currentDate.getMonth();
-		const currentYear = currentDate.getFullYear();
-		const filteredTransactions = storedTransactions.filter(transaction => {
-			const transactionDate = new Date(transaction.date);
-			return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
-		});
 
 		// Group transactions by month
 		setGroupedTransactions(groupTransactionsByMonth(storedTransactions));
