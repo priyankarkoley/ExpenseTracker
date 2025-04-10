@@ -12,7 +12,9 @@ interface TransactionType {
 
 export default function Transactions() {
 	const [tagTotals, setTagTotals] = useState<{ [key: string]: number }>({});
-	const [recentTransactions, setRecentTransactions] = useState<TransactionType[]>([]);
+	// const [recentTransactions, setRecentTransactions] = useState<TransactionType[]>([]);
+	const [monthVisibility, setMonthVisibility] = useState<{ [key: string]: boolean }>({});
+	const [groupedTransactions, setGroupedTransactions] = useState<{ [key: string]: TransactionType[] }>({});
 
 	// Helper function to format date
 	const formatDate = (dateString: string) => {
@@ -26,6 +28,22 @@ export default function Transactions() {
 			hour12: true,
 		};
 		return new Date(dateString).toLocaleString('en-US', options);
+	};
+
+	// Helper function to group transactions by month
+	const groupTransactionsByMonth = (transactions: TransactionType[]) => {
+		return transactions.reduce(
+			(acc, transaction) => {
+				const date = new Date(transaction.date);
+				const monthKey = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+				if (!acc[monthKey]) {
+					acc[monthKey] = [];
+				}
+				acc[monthKey].push(transaction);
+				return acc;
+			},
+			{} as { [key: string]: TransactionType[] },
+		);
 	};
 
 	useEffect(() => {
@@ -42,14 +60,16 @@ export default function Transactions() {
 		setTagTotals(totals);
 
 		// Filter transactions for the current month
-		const currentMonth = new Date().getMonth();
-		const currentYear = new Date().getFullYear();
+		const currentDate = new Date();
+		const currentMonth = currentDate.getMonth();
+		const currentYear = currentDate.getFullYear();
 		const filteredTransactions = storedTransactions.filter(transaction => {
 			const transactionDate = new Date(transaction.date);
 			return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
 		});
 
-		setRecentTransactions(filteredTransactions);
+		// Group transactions by month
+		setGroupedTransactions(groupTransactionsByMonth(storedTransactions));
 	}, []);
 
 	return (
@@ -73,21 +93,40 @@ export default function Transactions() {
 						)}
 					</div>
 				</div>
-				<div className="space-y-2">
+				<div className="space-y-1">
 					<div className="text-center text-3xl font-bold text-[#41644A]">Recent Transactions</div>
-					<div className="space-y-4 py-4">
-						{recentTransactions.length > 0 ? (
-							recentTransactions.map((transaction, index) => (
-								<div
-									key={index}
-									className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
-								>
-									<div className="flex justify-between">
-										<span className="text-lg font-bold">{transaction.tag}</span>
-										<span className="text-lg">{transaction.amount.toFixed(2)}</span>
+					<div className="space-y-4 py-3">
+						{Object.keys(groupedTransactions).length > 0 ? (
+							Object.entries(groupedTransactions).map(([month, transactions]) => (
+								<div key={month} className="space-y-2">
+									<div
+										className="cursor-pointer rounded-sm bg-[#41644A] px-4 py-2 font-bold"
+										onClick={() =>
+											setMonthVisibility(prev => ({
+												...prev,
+												[month]: !prev[month],
+											}))
+										}
+									>
+										<div className="flex justify-between">
+											{month}
+											<span>{monthVisibility[month] ? '▲' : '▼'}</span>
+										</div>
 									</div>
-									<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
-									<div className="text-sm text-gray-700">{transaction.description || 'No description'}</div>
+									{monthVisibility[month] &&
+										transactions.map((transaction, index) => (
+											<div
+												key={index}
+												className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
+											>
+												<div className="flex justify-between">
+													<span className="text-lg font-bold">{transaction.tag}</span>
+													<span className="text-lg">{transaction.amount.toFixed(2)}</span>
+												</div>
+												<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
+												<div className="text-sm text-gray-700">{transaction.description || 'No description'}</div>
+											</div>
+										))}
 								</div>
 							))
 						) : (
@@ -101,7 +140,7 @@ export default function Transactions() {
 					onClick={() => {
 						localStorage.clear();
 						setTagTotals({});
-						setRecentTransactions([]);
+						setGroupedTransactions({});
 					}}
 					className="w-full rounded-xl bg-[#932323] py-3.5 text-center"
 				>
