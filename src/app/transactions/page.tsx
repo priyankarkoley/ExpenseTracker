@@ -32,7 +32,7 @@ export default function Transactions() {
 
 	// Helper function to group transactions by month
 	const groupTransactionsByMonth = (transactions: TransactionType[]) => {
-		return transactions.reduce(
+		const grouped = transactions.reduce(
 			(acc, transaction) => {
 				const date = new Date(transaction.date);
 				const monthKey = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
@@ -44,6 +44,25 @@ export default function Transactions() {
 			},
 			{} as { [key: string]: TransactionType[] },
 		);
+
+		// Order by months
+		const ordered = Object.keys(grouped)
+			.sort((a, b) => {
+				const [monthA, yearA] = a.split(' ');
+				const [monthB, yearB] = b.split(' ');
+				const dateA = new Date(`${monthA} 1, ${yearA}`);
+				const dateB = new Date(`${monthB} 1, ${yearB}`);
+				return dateB.getTime() - dateA.getTime(); // Descending order
+			})
+			.reduce(
+				(acc, key) => {
+					acc[key] = grouped[key];
+					return acc;
+				},
+				{} as { [key: string]: TransactionType[] },
+			);
+
+		return ordered;
 	};
 
 	useEffect(() => {
