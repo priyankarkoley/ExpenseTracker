@@ -16,6 +16,7 @@ export default function Home() {
 	const [total, setTotal] = useState(0);
 	const [showAddTagModal, setShowAddTagModal] = useState(false);
 	const [transactionTime, setTransactionTime] = useState<string | null>(null);
+	const [description, setDescription] = useState<string>(''); // Add state for description
 
 	useEffect(() => {
 		const updateStateFromLocalStorage = () => {
@@ -103,7 +104,7 @@ export default function Home() {
 			setTotal(newTotal);
 			const transaction: TransactionType = {
 				tag: selectedTag,
-				description: '',
+				description: description.trim(), // Include description
 				amount: parsedAmount,
 				date: transactionTime || new Date().toISOString(),
 			};
@@ -113,6 +114,7 @@ export default function Home() {
 			storeToLocalStorage('transactions', updatedTransactions);
 		}
 		setAmount('');
+		setDescription(''); // Reset description
 		setSelectedTag(null);
 		setTransactionTime(null); // Reset the selected time
 	};
@@ -120,12 +122,12 @@ export default function Home() {
 	return (
 		<div className="flex h-full flex-col justify-between px-7 pt-8 pb-4">
 			{showAddTagModal && <AddTagModal />}
-			
+
 			{/* TOTAL */}
 			<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
 				<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
 			</div>
-			
+
 			{/* ADD TAG */}
 			<div className="px-4 pt-10">
 				<div className="text-lg font-medium">Select a tag:</div>
@@ -151,7 +153,7 @@ export default function Home() {
 					</button>
 				</div>
 			</div>
-			
+
 			{/* SELECT DATE AND TIME */}
 			<div className="space-y-2 px-4 pt-4 text-xl">
 				<div>Select date and time:</div>
@@ -165,10 +167,24 @@ export default function Home() {
 					/>
 				</div>
 			</div>
-			
+
 			{/* SELECT DESCRIPTION */}
-			
-			
+			<div className="space-y-2 px-4 pt-4 text-xl">
+				<div>Enter description:</div>
+				<div className="flex space-x-2">
+					<input
+						type="text"
+						value={description}
+						onChange={e => setDescription(e.target.value)}
+						onKeyDown={e => {
+							if (e.key === 'Enter') handleAdd();
+						}}
+						placeholder="Description"
+						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+					/>
+				</div>
+			</div>
+
 			{/* ADD AMOUNT */}
 			<div className="space-y-2 px-4 pt-4 text-xl">
 				<div>Enter amount to add:</div>
@@ -190,7 +206,7 @@ export default function Home() {
 					</button>
 				</div>
 			</div>
-			
+
 			{/* TRANSACTIONS HISTORY*/}
 			<Link
 				href="/transactions"
