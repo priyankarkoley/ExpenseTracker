@@ -132,11 +132,11 @@ export default function Home() {
 				{/* ADD TAG */}
 				<div className="space-y-1 pt-4 text-xl">
 					<div>Select a tag:</div>
-					<div className="mt-2 text-sm flex space-x-2 overflow-x-auto">
+					<div className="mt-2 flex space-x-2 overflow-x-auto text-sm">
 						{tags.map(tag => (
 							<button
 								key={tag}
-								className={`rounded-xl border-4 bg-[#FFA725] px-2 py-1 font-semibold tracking-wider ${
+								className={`rounded-xl text-black border-4 bg-[#FFA725] px-2 py-1 font-semibold tracking-wider ${
 									selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
 								}`}
 								onClick={() => {
@@ -147,7 +147,7 @@ export default function Home() {
 							</button>
 						))}
 						<button
-							className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
+							className="boreder-[#FFA725] text-black border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
 							onClick={() => setShowAddTagModal(true)}
 						>
 							+
