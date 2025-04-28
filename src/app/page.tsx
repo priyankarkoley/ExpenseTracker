@@ -15,6 +15,7 @@ export default function Home() {
 	const [selectedTag, setSelectedTag] = useState<string | null>(null);
 	const [total, setTotal] = useState(0);
 	const [showAddTagModal, setShowAddTagModal] = useState(false);
+	const [transactionTime, setTransactionTime] = useState<string | null>(null);
 
 	useEffect(() => {
 		const updateStateFromLocalStorage = () => {
@@ -104,7 +105,7 @@ export default function Home() {
 				tag: selectedTag,
 				description: '',
 				amount: parsedAmount,
-				date: new Date().toISOString(),
+				date: transactionTime || new Date().toISOString(),
 			};
 
 			const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
@@ -113,64 +114,83 @@ export default function Home() {
 		}
 		setAmount('');
 		setSelectedTag(null);
+		setTransactionTime(null); // Reset the selected time
 	};
 
 	return (
-		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
+		<div className="flex h-full flex-col justify-between px-7 pt-8 pb-4">
 			{showAddTagModal && <AddTagModal />}
-			<div className="h-[calc(88vh -.875rem)] space-y-4 overflow-y-auto">
-				{/* TOTAL */}
-				<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
-					<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
-				</div>
-				{/* ADD TAG */}
-				<div className="px-4 pt-10">
-					<div className="text-lg font-medium">Select a tag:</div>
-					<div className="mt-2 flex space-x-2 overflow-x-auto">
-						{tags.map(tag => (
-							<button
-								key={tag}
-								className={`rounded-xl border-4 bg-[#FFA725] px-4 py-2 font-semibold tracking-wider ${
-									selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
-								}`}
-								onClick={() => {
-									setSelectedTag(tag);
-								}}
-							>
-								{tag}
-							</button>
-						))}
+			
+			{/* TOTAL */}
+			<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
+				<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
+			</div>
+			
+			{/* ADD TAG */}
+			<div className="px-4 pt-10">
+				<div className="text-lg font-medium">Select a tag:</div>
+				<div className="mt-2 flex space-x-2 overflow-x-auto">
+					{tags.map(tag => (
 						<button
-							className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
-							onClick={() => setShowAddTagModal(true)}
-						>
-							+
-						</button>
-					</div>
-				</div>
-				{/* ADD AMOUNT */}
-				<div className="space-y-2 px-4 pt-4 text-xl">
-					<div>Enter amount to add:</div>
-					<div className="flex space-x-2">
-						<input
-							autoFocus
-							type="number"
-							inputMode="decimal"
-							value={amount}
-							min={0}
-							onChange={e => setAmount(e.target.value)}
-							onKeyDown={e => {
-								if (e.key === 'Enter') handleAdd();
+							key={tag}
+							className={`rounded-xl border-4 bg-[#FFA725] px-4 py-2 font-semibold tracking-wider ${
+								selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
+							}`}
+							onClick={() => {
+								setSelectedTag(tag);
 							}}
-							className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
-						/>
-						<button onClick={handleAdd} className="rounded-xl bg-[#41644A] px-4 py-3.5 font-semibold tracking-wider">
-							ADD
+						>
+							{tag}
 						</button>
-					</div>
+					))}
+					<button
+						className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
+						onClick={() => setShowAddTagModal(true)}
+					>
+						+
+					</button>
 				</div>
 			</div>
-
+			
+			{/* SELECT DATE AND TIME */}
+			<div className="space-y-2 px-4 pt-4 text-xl">
+				<div>Select date and time:</div>
+				<div className="flex space-x-2">
+					<input
+						type="datetime-local"
+						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+						onChange={e => {
+							setTransactionTime(new Date(e.target.value).toISOString());
+						}}
+					/>
+				</div>
+			</div>
+			
+			{/* SELECT DESCRIPTION */}
+			
+			
+			{/* ADD AMOUNT */}
+			<div className="space-y-2 px-4 pt-4 text-xl">
+				<div>Enter amount to add:</div>
+				<div className="flex space-x-2">
+					<input
+						autoFocus
+						type="number"
+						inputMode="decimal"
+						value={amount}
+						min={0}
+						onChange={e => setAmount(e.target.value)}
+						onKeyDown={e => {
+							if (e.key === 'Enter') handleAdd();
+						}}
+						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+					/>
+					<button onClick={handleAdd} className="rounded-xl bg-[#41644A] px-4 py-3.5 font-semibold tracking-wider">
+						ADD
+					</button>
+				</div>
+			</div>
+			
 			{/* TRANSACTIONS HISTORY*/}
 			<Link
 				href="/transactions"
