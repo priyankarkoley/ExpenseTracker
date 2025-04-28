@@ -43,6 +43,7 @@ export default function Home() {
 		updateStateFromLocalStorage();
 
 		window.addEventListener('storage', updateStateFromLocalStorage);
+		setTransactionTime(new Date().toISOString());
 		return () => {
 			window.removeEventListener('storage', updateStateFromLocalStorage);
 		};
@@ -75,7 +76,6 @@ export default function Home() {
 						</button>
 					</div>
 					<input
-						autoFocus
 						type="text"
 						value={tagName.toUpperCase()}
 						onChange={e => setTagName(e.target.value)}
@@ -120,97 +120,100 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex h-full flex-col justify-between px-7 pt-8 pb-4">
+		<div className="flex h-full flex-col justify-between px-9 pt-6">
 			{showAddTagModal && <AddTagModal />}
 
 			{/* TOTAL */}
-			<div className="m-4 flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
+			<div className="flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
 				<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
 			</div>
 
-			{/* ADD TAG */}
-			<div className="px-4 pt-10">
-				<div className="text-lg font-medium">Select a tag:</div>
-				<div className="mt-2 flex space-x-2 overflow-x-auto">
-					{tags.map(tag => (
+			<div>
+				{/* ADD TAG */}
+				<div className="space-y-1 pt-4 text-xl">
+					<div>Select a tag:</div>
+					<div className="mt-2 text-sm flex space-x-2 overflow-x-auto">
+						{tags.map(tag => (
+							<button
+								key={tag}
+								className={`rounded-xl border-4 bg-[#FFA725] px-2 py-1 font-semibold tracking-wider ${
+									selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
+								}`}
+								onClick={() => {
+									setSelectedTag(tag);
+								}}
+							>
+								{tag}
+							</button>
+						))}
 						<button
-							key={tag}
-							className={`rounded-xl border-4 bg-[#FFA725] px-4 py-2 font-semibold tracking-wider ${
-								selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
-							}`}
-							onClick={() => {
-								setSelectedTag(tag);
-							}}
+							className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
+							onClick={() => setShowAddTagModal(true)}
 						>
-							{tag}
+							+
 						</button>
-					))}
-					<button
-						className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
-						onClick={() => setShowAddTagModal(true)}
-					>
-						+
-					</button>
+					</div>
 				</div>
-			</div>
-
-			{/* SELECT DATE AND TIME */}
-			<div className="space-y-2 px-4 pt-4 text-xl">
-				<div>Select date and time:</div>
-				<div className="flex space-x-2">
-					<input
-						type="datetime-local"
-						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
-						onChange={e => {
-							setTransactionTime(new Date(e.target.value).toISOString());
-						}}
-					/>
+				{/* SELECT DATE AND TIME */}
+				<div className="space-y-1 pt-4 text-xl">
+					<div>Select date and time:</div>
+					<div className="flex h-11 space-x-2">
+						<input
+							type="datetime-local"
+							value={
+								transactionTime
+									? new Date(new Date(transactionTime).getTime() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 16)
+									: ''
+							}
+							className="h-11 w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+							onChange={e => {
+								setTransactionTime(new Date(e.target.value).toISOString());
+							}}
+						/>
+					</div>
 				</div>
-			</div>
-
-			{/* SELECT DESCRIPTION */}
-			<div className="space-y-2 px-4 pt-4 text-xl">
-				<div>Enter description:</div>
-				<div className="flex space-x-2">
-					<input
-						type="text"
-						value={description}
-						onChange={e => setDescription(e.target.value)}
-						onKeyDown={e => {
-							if (e.key === 'Enter') handleAdd();
-						}}
-						placeholder="Description"
-						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
-					/>
+				{/* SELECT DESCRIPTION */}
+				<div className="space-y-1 pt-4 text-xl">
+					<div>Enter description:</div>
+					<div className="flex h-11 space-x-2">
+						<input
+							type="text"
+							value={description}
+							onChange={e => setDescription(e.target.value)}
+							onKeyDown={e => {
+								if (e.key === 'Enter') handleAdd();
+							}}
+							placeholder="Description"
+							className="h-11 w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+						/>
+					</div>
 				</div>
-			</div>
-
-			{/* ADD AMOUNT */}
-			<div className="space-y-2 px-4 pt-4 text-xl">
-				<div>Enter amount to add:</div>
-				<div className="flex space-x-2">
-					<input
-						autoFocus
-						type="number"
-						inputMode="decimal"
-						value={amount}
-						min={0}
-						onChange={e => setAmount(e.target.value)}
-						onKeyDown={e => {
-							if (e.key === 'Enter') handleAdd();
-						}}
-						className="w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
-					/>
-					<button onClick={handleAdd} className="rounded-xl bg-[#41644A] px-4 py-3.5 font-semibold tracking-wider">
-						ADD
-					</button>
+				{/* ADD AMOUNT */}
+				<div className="space-y-1 pt-4 text-xl">
+					<div>Enter amount to add:</div>
+					<div className="flex h-11 space-x-2">
+						<input
+							type="number"
+							inputMode="decimal"
+							value={amount}
+							min={0}
+							onChange={e => setAmount(e.target.value)}
+							onKeyDown={e => {
+								if (e.key === 'Enter') handleAdd();
+							}}
+							className="h-full w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
+						/>
+						<button onClick={handleAdd} className="h-full rounded-xl bg-[#41644A] px-4 font-semibold tracking-wider">
+							ADD
+						</button>
+					</div>
 				</div>
 			</div>
 
 			{/* TRANSACTIONS HISTORY*/}
 			<Link
 				href="/transactions"
-				className="mt-10 rounded-xl bg-[#41644A] py-3.5 text-center font-semibold tracking-wider"
+				className="mt-11 rounded-xl bg-[#41644A] py-3.5 text-center font-semibold tracking-wider"
 			>
 				OPEN DETAILED VIEW
 			</Link>
