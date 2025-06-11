@@ -12,9 +12,9 @@ interface TransactionType {
 
 export default function Transactions() {
 	const [tagTotals, setTagTotals] = useState<{ [key: string]: number }>({});
-	// const [recentTransactions, setRecentTransactions] = useState<TransactionType[]>([]);
 	const [monthVisibility, setMonthVisibility] = useState<{ [key: string]: boolean }>({});
 	const [groupedTransactions, setGroupedTransactions] = useState<{ [key: string]: TransactionType[] }>({});
+	const [selectedMonth, setSelectedMonth] = useState<string>('');
 
 	// Helper function to format date
 	const formatDate = (dateString: string) => {
@@ -84,14 +84,56 @@ export default function Transactions() {
 		setTagTotals(totals);
 
 		// Group transactions by month
-		setGroupedTransactions(groupTransactionsByMonth(storedTransactions));
+		const grouped = groupTransactionsByMonth(storedTransactions);
+		setGroupedTransactions(grouped);
+
+		// Set default selected month to current month if exists, else first available
+		const monthKeys = Object.keys(grouped);
+		const currentMonthKey = `${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}`;
+		if (monthKeys.includes(currentMonthKey)) {
+			setSelectedMonth(currentMonthKey);
+		} else if (monthKeys.length > 0) {
+			setSelectedMonth(monthKeys[0]);
+		}
 	}, []);
+
+	// Update tagTotals when selectedMonth changes
+	useEffect(() => {
+		if (!selectedMonth || !groupedTransactions[selectedMonth]) {
+			setTagTotals({});
+			return;
+		}
+		const totals: { [key: string]: number } = {};
+		groupedTransactions[selectedMonth].forEach(transaction => {
+			if (!totals[transaction.tag]) {
+				totals[transaction.tag] = 0;
+			}
+			totals[transaction.tag] += transaction.amount;
+		});
+		setTagTotals(totals);
+	}, [selectedMonth, groupedTransactions]);
 
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="h-[calc(88vh -.875rem)] space-y-10 overflow-y-auto">
 				<div className="space-y-2">
 					<div className="text-center text-3xl font-bold text-[#41644A]">Tag-wise Expenditure</div>
+
+					{/* Month Selector */}
+					<div className="flex justify-center py-2">
+						<select
+							className="rounded-lg border px-3 py-2 text-lg font-semibold text-[#41644A] shadow"
+							value={selectedMonth}
+							onChange={e => setSelectedMonth(e.target.value)}
+						>
+							{Object.keys(groupedTransactions).map(month => (
+								<option key={month} value={month}>
+									{month}
+								</option>
+							))}
+						</select>
+					</div>
+
 					<div className="space-y-4 py-4">
 						{Object.keys(tagTotals).length > 0 ? (
 							Object.entries(tagTotals).map(([tag, total]) => (
@@ -111,39 +153,37 @@ export default function Transactions() {
 				<div className="space-y-1">
 					<div className="text-center text-3xl font-bold text-[#41644A]">Recent Transactions</div>
 					<div className="space-y-4 py-3">
-						{Object.keys(groupedTransactions).length > 0 ? (
-							Object.entries(groupedTransactions).map(([month, transactions]) => (
-								<div key={month} className="space-y-2">
-									<div
-										className="cursor-pointer rounded-sm bg-[#41644A] px-4 py-2 font-bold"
-										onClick={() =>
-											setMonthVisibility(prev => ({
-												...prev,
-												[month]: !prev[month],
-											}))
-										}
-									>
-										<div className="flex justify-between">
-											{month}
-											<span>{monthVisibility[month] ? '▲' : '▼'}</span>
-										</div>
+						{selectedMonth && groupedTransactions[selectedMonth] && groupedTransactions[selectedMonth].length > 0 ? (
+							<div className="space-y-2">
+								<div
+									className="cursor-pointer rounded-sm bg-[#41644A] px-4 py-2 font-bold"
+									onClick={() =>
+										setMonthVisibility(prev => ({
+											...prev,
+											[selectedMonth]: !prev[selectedMonth],
+										}))
+									}
+								>
+									<div className="flex justify-between">
+										{selectedMonth}
+										<span>{monthVisibility[selectedMonth] ? '▲' : '▼'}</span>
 									</div>
-									{monthVisibility[month] &&
-										transactions.map((transaction, index) => (
-											<div
-												key={index}
-												className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
-											>
-												<div className="flex justify-between">
-													<span className="text-lg font-bold">{transaction.tag}</span>
-													<span className="text-lg">{transaction.amount.toFixed(2)}</span>
-												</div>
-												<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
-												<div className="text-sm text-gray-700">{transaction.description || 'No description'}</div>
-											</div>
-										))}
 								</div>
-							))
+								{monthVisibility[selectedMonth] &&
+									groupedTransactions[selectedMonth].map((transaction, index) => (
+										<div
+											key={index}
+											className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
+										>
+											<div className="flex justify-between">
+												<span className="text-lg font-bold">{transaction.tag}</span>
+												<span className="text-lg">{transaction.amount.toFixed(2)}</span>
+											</div>
+											<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
+											<div className="text-sm text-gray-700">{transaction.description || 'No description'}</div>
+										</div>
+									))}
+							</div>
 						) : (
 							<div className="text-center text-lg text-gray-500">No recent transactions found</div>
 						)}
