@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { retrieveFromLocalStorage, storeToLocalStorage } from '@/utils/localStorage';
 interface TransactionType {
 	tag: string;
@@ -54,13 +55,16 @@ export default function Home() {
 		const handleAddTag = () => {
 			if (tagName.trim() !== '') {
 				if (tags.includes(tagName.toUpperCase())) {
-					alert('Tag already exists!');
+					toast.error('Tag already exists!');
 					return;
 				}
 				storeToLocalStorage('tags', [...tags, tagName.toUpperCase()]);
 				setTags(prevTags => [...prevTags, tagName.toUpperCase()]);
 				setTagName('');
 				setShowAddTagModal(false);
+				toast.success('Tag added!');
+			} else {
+				toast.error('Tag name cannot be empty!');
 			}
 		};
 		return (
@@ -95,7 +99,7 @@ export default function Home() {
 
 	const handleAdd = () => {
 		if (!selectedTag) {
-			alert('Please select a tag');
+			toast.error('Please select a tag');
 			return;
 		}
 		const parsedAmount = parseFloat(amount);
@@ -112,6 +116,9 @@ export default function Home() {
 			const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
 			const updatedTransactions = [...storedTransactions, transaction];
 			storeToLocalStorage('transactions', updatedTransactions);
+			toast.success('Transaction added!');
+		} else {
+			toast.error('Please enter a valid amount');
 		}
 		setAmount('');
 		setDescription(''); // Reset description
@@ -122,12 +129,10 @@ export default function Home() {
 	return (
 		<div className="flex h-full flex-col justify-between px-9 pt-6">
 			{showAddTagModal && <AddTagModal />}
-
 			{/* TOTAL */}
 			<div className="flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
 				<span className="pt-4 pr-2 text-lg">Total:</span> ₹{total ? total.toFixed(2) : 'N.A.'}
 			</div>
-
 			<div>
 				{/* ADD TAG */}
 				<div className="space-y-1 pt-4 text-xl">
@@ -136,7 +141,7 @@ export default function Home() {
 						{tags.map(tag => (
 							<button
 								key={tag}
-								className={`rounded-xl text-black border-4 bg-[#FFA725] px-2 py-1 font-semibold tracking-wider ${
+								className={`rounded-xl border-4 bg-[#FFA725] px-2 py-1 font-semibold tracking-wider text-black ${
 									selectedTag === tag ? 'border-blue-600' : 'border-[#FFA725]'
 								}`}
 								onClick={() => {
@@ -147,7 +152,7 @@ export default function Home() {
 							</button>
 						))}
 						<button
-							className="boreder-[#FFA725] text-black border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider"
+							className="boreder-[#FFA725] border- rounded-xl bg-[#FFA725] px-4 py-2 font-semibold tracking-wider text-black"
 							onClick={() => setShowAddTagModal(true)}
 						>
 							+
@@ -209,7 +214,6 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
-
 			{/* TRANSACTIONS HISTORY*/}
 			<Link
 				href="/transactions"

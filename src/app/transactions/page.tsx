@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { retrieveFromLocalStorage } from '@/utils/localStorage';
 import Link from 'next/link';
 
@@ -65,7 +66,8 @@ export default function Transactions() {
 		return ordered;
 	};
 
-	useEffect(() => {
+	// Extracted logic for updating transactions state
+	const updateTransactionsState = () => {
 		const storedTransactions = retrieveFromLocalStorage<TransactionType[]>('transactions') || [];
 		const totals: { [key: string]: number } = {};
 		const currentMonth = new Date().getMonth();
@@ -95,6 +97,10 @@ export default function Transactions() {
 		} else if (monthKeys.length > 0) {
 			setSelectedMonth(monthKeys[0]);
 		}
+	};
+
+	useEffect(() => {
+		updateTransactionsState();
 	}, []);
 
 	// Update tagTotals when selectedMonth changes
@@ -246,6 +252,56 @@ export default function Transactions() {
 				>
 					DELETE
 				</button> */}
+				<button
+					onClick={() => {
+						try {
+							const allData = { ...localStorage };
+							const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+							const url = URL.createObjectURL(blob);
+							const a = document.createElement('a');
+							a.href = url;
+							a.download = 'localStorage-export.json';
+							document.body.appendChild(a);
+							a.click();
+							document.body.removeChild(a);
+							URL.revokeObjectURL(url);
+							toast.success('Exported localStorage successfully!');
+						} catch (err) {
+							toast.error('Failed to export localStorage.');
+						}
+					}}
+					className="w-full rounded-xl bg-[#41644A] py-3.5 text-center"
+				>
+					EXPORT
+				</button>
+				<button
+					onClick={() => {
+						const input = document.createElement('input');
+						input.type = 'file';
+						input.accept = 'application/json';
+						input.onchange = async (e: any) => {
+							const file = e.target.files[0];
+							if (!file) return;
+							const text = await file.text();
+							try {
+								const data = JSON.parse(text);
+								if (typeof data === 'object' && data !== null) {
+									Object.entries(data).forEach(([key, value]) => {
+										localStorage.setItem(key, value as string);
+									});
+									toast.success('Imported localStorage successfully!');
+									updateTransactionsState();
+								}
+							} catch (err) {
+								toast.error('Invalid JSON file.');
+							}
+						};
+						input.click();
+					}}
+					className="w-full rounded-xl bg-[#41644A] py-3.5 text-center"
+				>
+					IMPORT
+				</button>
 				<Link href="/" className="w-full rounded-xl bg-[#41644A] py-3.5 text-center">
 					HOME
 				</Link>
