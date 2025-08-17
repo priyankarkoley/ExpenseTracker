@@ -302,7 +302,7 @@ export default function Transactions() {
 				>
 					IMPORT
 				</button>
-				<Link href="/" className="w-full rounded-xl bg-[#41644A] py-3.5 text-center">
+				<Link href="/" className="w-full rounded-xl bg-[#FFA725] py-3.5 text-center text-black">
 					HOME
 				</Link>
 			</div>
