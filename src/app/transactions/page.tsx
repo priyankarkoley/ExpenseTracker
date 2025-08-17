@@ -145,19 +145,70 @@ export default function Transactions() {
 									</div>
 								</div>
 								{recentTransVisible &&
-									groupedTransactions[selectedMonth].map((transaction, index) => (
-										<div
-											key={index}
-											className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
-										>
-											<div className="flex justify-between">
-												<span className="text-lg font-bold">{transaction.tag}</span>
-												<span className="text-lg">{transaction.amount.toFixed(2)}</span>
-											</div>
-											<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
-											<div className="text-sm text-gray-700">{transaction.description || 'No description'}</div>
-										</div>
-									))}
+									(() => {
+										// Group transactions by day (descending)
+										const transactions = groupedTransactions[selectedMonth] || [];
+										const groupedByDay: { [key: string]: TransactionType[] } = {};
+										transactions.forEach(tx => {
+											const dateObj = new Date(tx.date);
+											// Format: '17th Aug 2025'
+											const day = dateObj.getDate();
+											const daySuffix = (d => {
+												if (d > 3 && d < 21) return 'th';
+												switch (d % 10) {
+													case 1:
+														return 'st';
+													case 2:
+														return 'nd';
+													case 3:
+														return 'rd';
+													default:
+														return 'th';
+												}
+											})(day);
+											const dayKey = `${day}${daySuffix} ${dateObj.toLocaleString('default', { month: 'short' })} ${dateObj.getFullYear()}`;
+											if (!groupedByDay[dayKey]) groupedByDay[dayKey] = [];
+											groupedByDay[dayKey].push(tx);
+										});
+										// Sort days descending (recent first)
+										const sortedDayKeys = Object.keys(groupedByDay).sort((a, b) => {
+											// Parse '17th Aug 2025' to Date
+											const parseDayKey = (key: string) => {
+												const [dayWithSuffix, month, year] = key.split(' ');
+												const day = parseInt(dayWithSuffix);
+												return new Date(`${month} ${day}, ${year}`);
+											};
+											return parseDayKey(b).getTime() - parseDayKey(a).getTime();
+										});
+										return (
+											<>
+												{sortedDayKeys.map(dayKey => (
+													<div key={dayKey}>
+														<div className="mb-1 text-lg font-bold text-[#41644A]">{dayKey}-</div>
+														<div className="space-y-2">
+															{groupedByDay[dayKey]
+																.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+																.map((transaction, idx) => (
+																	<div
+																		key={idx}
+																		className="flex flex-col rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
+																	>
+																		<div className="flex justify-between">
+																			<span className="text-lg font-bold">{transaction.tag}</span>
+																			<span className="text-lg">{transaction.amount.toFixed(2)}</span>
+																		</div>
+																		<div className="text-sm text-gray-700">{formatDate(transaction.date)}</div>
+																		<div className="text-sm text-gray-700">
+																			{transaction.description || 'No description'}
+																		</div>
+																	</div>
+																))}
+														</div>
+													</div>
+												))}
+											</>
+										);
+									})()}
 							</div>
 						) : (
 							<div className="text-center text-lg text-gray-500">No recent transactions found</div>
