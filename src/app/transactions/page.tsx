@@ -187,10 +187,10 @@ export default function Transactions() {
 											return parseDayKey(b).getTime() - parseDayKey(a).getTime();
 										});
 										return (
-											<>
-												{sortedDayKeys.map(dayKey => (
-													<div key={dayKey}>
-														<div className="mb-1 text-lg font-bold text-[#41644A]">{dayKey}-</div>
+											<div className="mt-6 space-y-8">
+												{sortedDayKeys.map((dayKey, i) => (
+													<div key={dayKey} className={`space-y-1 ${i&&'border-t'} pt-2`}>
+														<span className="inline-block rounded-lg py-1 text-2xl font-bold text-white">{dayKey}</span>
 														<div className="space-y-2">
 															{groupedByDay[dayKey]
 																.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -212,7 +212,7 @@ export default function Transactions() {
 														</div>
 													</div>
 												))}
-											</>
+											</div>
 										);
 									})()}
 							</div>
