@@ -12,7 +12,7 @@ interface TransactionType {
 
 export default function Transactions() {
 	const [tagTotals, setTagTotals] = useState<{ [key: string]: number }>({});
-	const [monthVisibility, setMonthVisibility] = useState<{ [key: string]: boolean }>({});
+	const [recentTransVisible, setRecentTransVisible] = useState<boolean>(true);
 	const [groupedTransactions, setGroupedTransactions] = useState<{ [key: string]: TransactionType[] }>({});
 	const [selectedMonth, setSelectedMonth] = useState<string>('');
 
@@ -116,39 +116,19 @@ export default function Transactions() {
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="h-[calc(88vh -.875rem)] space-y-10 overflow-y-auto">
-				<div className="space-y-2">
-					<div className="text-center text-3xl font-bold text-[#41644A]">Tag-wise Expenditure</div>
-
-					{/* Month Selector */}
-					<div className="flex justify-center py-2">
-						<select
-							className="rounded-lg border px-3 py-2 text-lg font-semibold text-[#41644A] shadow"
-							value={selectedMonth}
-							onChange={e => setSelectedMonth(e.target.value)}
-						>
-							{Object.keys(groupedTransactions).map(month => (
-								<option key={month} value={month}>
-									{month}
-								</option>
-							))}
-						</select>
-					</div>
-
-					<div className="space-y-4 py-4">
-						{Object.keys(tagTotals).length > 0 ? (
-							Object.entries(tagTotals).map(([tag, total]) => (
-								<div
-									key={tag}
-									className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
-								>
-									<span className="text-xl">{tag}</span>
-									<span className="text-xl">{total.toFixed(2)}</span>
-								</div>
-							))
-						) : (
-							<div className="text-center text-lg text-gray-500">No transactions found</div>
-						)}
-					</div>
+				{/* Month Selector */}
+				<div className="flex justify-center py-2">
+					<select
+						className="rounded-lg border px-3 py-2 text-lg font-semibold text-[#41644A] shadow"
+						value={selectedMonth}
+						onChange={e => setSelectedMonth(e.target.value)}
+					>
+						{Object.keys(groupedTransactions).map(month => (
+							<option key={month} value={month}>
+								{month}
+							</option>
+						))}
+					</select>
 				</div>
 				<div className="space-y-1">
 					<div className="text-center text-3xl font-bold text-[#41644A]">Recent Transactions</div>
@@ -157,19 +137,14 @@ export default function Transactions() {
 							<div className="space-y-2">
 								<div
 									className="cursor-pointer rounded-sm bg-[#41644A] px-4 py-2 font-bold"
-									onClick={() =>
-										setMonthVisibility(prev => ({
-											...prev,
-											[selectedMonth]: !prev[selectedMonth],
-										}))
-									}
+									onClick={() => setRecentTransVisible(prev => !prev)}
 								>
 									<div className="flex justify-between">
 										{selectedMonth}
-										<span>{monthVisibility[selectedMonth] ? '▲' : '▼'}</span>
+										<span>{recentTransVisible ? '▲' : '▼'}</span>
 									</div>
 								</div>
-								{monthVisibility[selectedMonth] &&
+								{recentTransVisible &&
 									groupedTransactions[selectedMonth].map((transaction, index) => (
 										<div
 											key={index}
@@ -189,9 +164,28 @@ export default function Transactions() {
 						)}
 					</div>
 				</div>
+				<div className="space-y-2">
+					<div className="text-center text-3xl font-bold text-[#41644A]">Tag-wise Expenditure</div>
+
+					<div className="space-y-4 py-4">
+						{Object.keys(tagTotals).length > 0 ? (
+							Object.entries(tagTotals).map(([tag, total]) => (
+								<div
+									key={tag}
+									className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
+								>
+									<span className="text-xl">{tag}</span>
+									<span className="text-xl">{total.toFixed(2)}</span>
+								</div>
+							))
+						) : (
+							<div className="text-center text-lg text-gray-500">No transactions found</div>
+						)}
+					</div>
+				</div>
 			</div>
 			<div className="mt-4 flex space-x-4 font-semibold tracking-wider text-white shadow-lg">
-				<button
+				{/* <button
 					onClick={() => {
 						localStorage.clear();
 						setTagTotals({});
@@ -200,7 +194,7 @@ export default function Transactions() {
 					className="w-full rounded-xl bg-[#932323] py-3.5 text-center"
 				>
 					DELETE
-				</button>
+				</button> */}
 				<Link href="/" className="w-full rounded-xl bg-[#41644A] py-3.5 text-center">
 					HOME
 				</Link>
