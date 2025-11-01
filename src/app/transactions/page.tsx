@@ -120,6 +120,9 @@ export default function Transactions() {
 		setTagTotals(totals);
 	}, [selectedMonth, groupedTransactions]);
 
+	// compute total for the selected month
+	const monthTotal = Object.values(tagTotals).reduce((sum, v) => sum + v, 0);
+
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="h-[calc(88vh -.875rem)] space-y-10 overflow-y-auto">
@@ -189,7 +192,7 @@ export default function Transactions() {
 										return (
 											<div className="mt-6 space-y-8">
 												{sortedDayKeys.map((dayKey, i) => (
-													<div key={dayKey} className={`space-y-1 ${i&&'border-t'} pt-2`}>
+													<div key={dayKey} className={`space-y-1 ${i && 'border-t'} pt-2`}>
 														<span className="inline-block rounded-lg py-1 text-2xl font-bold text-white">{dayKey}</span>
 														<div className="space-y-2">
 															{groupedByDay[dayKey]
@@ -225,15 +228,24 @@ export default function Transactions() {
 					<div className="text-center text-3xl font-bold text-white">Tag-wise Expenditure</div>
 					<div className="space-y-4 py-4">
 						{Object.keys(tagTotals).length > 0 ? (
-							Object.entries(tagTotals).map(([tag, total]) => (
-								<div
-									key={tag}
-									className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
-								>
-									<span className="text-xl">{tag}</span>
-									<span className="text-xl">{total.toFixed(2)}</span>
+							<>
+								{/* Total row shown before individual tags */}
+								<div className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg">
+									<span className="text-xl">Total</span>
+									<span className="text-xl">{monthTotal.toFixed(2)}</span>
 								</div>
-							))
+
+								{/* Individual tag rows */}
+								{Object.entries(tagTotals).map(([tag, total]) => (
+									<div
+										key={tag}
+										className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
+									>
+										<span className="text-xl">{tag}</span>
+										<span className="text-xl">{total.toFixed(2)}</span>
+									</div>
+								))}
+							</>
 						) : (
 							<div className="text-center text-lg text-gray-500">No transactions found</div>
 						)}
