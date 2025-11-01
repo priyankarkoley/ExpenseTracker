@@ -127,7 +127,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex h-full flex-col justify-between px-9 pt-6">
+		<>
 			{showAddTagModal && <AddTagModal />}
 			{/* TOTAL */}
 			<div className="flex h-40 items-center justify-center rounded-4xl bg-[#FFA725] font-serif text-5xl font-semibold text-black">
@@ -214,13 +214,6 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
-			{/* TRANSACTIONS HISTORY*/}
-			<Link
-				href="/transactions"
-				className="mt-11 rounded-xl bg-[#41644A] py-3.5 text-center font-semibold tracking-wider"
-			>
-				OPEN DETAILED VIEW
-			</Link>
-		</div>
+		</>
 	);
 }
