@@ -1,14 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { retrieveFromLocalStorage, storeToLocalStorage } from '@/utils/localStorage';
 import { toast } from 'react-hot-toast';
-import Link from 'next/link';
 
 export default function EditPage() {
 	const [tagsJSON, setTagsJSON] = useState('');
 	const [transactionsJSON, setTransactionsJSON] = useState('');
 	const [originalTagsJSON, setOriginalTagsJSON] = useState('');
 	const [originalTransactionsJSON, setOriginalTransactionsJSON] = useState('');
+
+	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {
 		// Load initial values from localStorage and sort them
@@ -68,11 +69,11 @@ export default function EditPage() {
 				<div className="max-h-1/3 space-y-2">
 					<div className="text-xl font-bold">Edit Tags</div>
 					<textarea
-						enterKeyHint='next'
+						enterKeyHint="next"
 						onKeyDown={e => {
 							if (e.key === 'Enter' && !e.shiftKey) {
 								e.preventDefault();
-								(e.target as HTMLTextAreaElement).blur(); // 👈 closes the keyboard
+								textAreaRef?.current?.focus();
 							}
 						}}
 						className="h-fit w-full rounded border p-2"
@@ -84,7 +85,8 @@ export default function EditPage() {
 				<div className="h-full space-y-2 pb-10">
 					<div className="text-xl font-bold">Edit Transactions</div>
 					<textarea
-						enterKeyHint='done'
+						ref={textAreaRef}
+						enterKeyHint="done"
 						onKeyDown={e => {
 							if (e.key === 'Enter' && !e.shiftKey) {
 								e.preventDefault();
