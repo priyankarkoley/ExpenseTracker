@@ -69,7 +69,7 @@ export default function EditPage() {
 					<div className="text-xl font-bold">Edit Tags</div>
 					<textarea
 						className="h-fit w-full rounded border p-2"
-						rows={(() => (tagsJSON.split(/\r\n|\r|\n/).length > 7 ? 7 : tagsJSON.split(/\r\n|\r|\n/).length))()}
+						rows={(() => (tagsJSON.split(/\r\n|\r|\n/).length > 5 ? 5 : tagsJSON.split(/\r\n|\r|\n/).length))()}
 						value={tagsJSON}
 						onChange={e => setTagsJSON(e.target.value)}
 					/>
