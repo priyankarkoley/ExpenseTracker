@@ -63,8 +63,8 @@ export default function EditPage() {
 	const isUnchanged = tagsJSON === originalTagsJSON && transactionsJSON === originalTransactionsJSON;
 
 	return (
-		<div className="relative h-full">
-			<div className="flex h-full flex-col space-y-5 overflow-y-auto pb-16">
+		<div className="h-full">
+			<div className="flex h-[calc(98vh-11.75rem)] flex-col space-y-5 overflow-y-auto">
 				<div className="max-h-1/3 space-y-2">
 					<div className="text-xl font-bold">Edit Tags</div>
 					<textarea
@@ -83,7 +83,7 @@ export default function EditPage() {
 					/>
 				</div>
 			</div>
-			<div className="absolute bottom-0 flex w-full space-x-4 pt-4 font-semibold tracking-wider text-white shadow-lg">
+			<div className="flex w-full space-x-4 pt-4 font-semibold tracking-wider text-white shadow-lg">
 				<button
 					onClick={resetFields}
 					disabled={isUnchanged}
