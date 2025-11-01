@@ -208,7 +208,10 @@ export default function Home() {
 							}}
 							className="h-full w-full rounded-xl bg-white px-4 text-2xl text-[#0D4715] outline-none"
 						/>
-						<button onClick={handleAdd} className="h-full rounded-xl bg-[#FFA725] text-black px-4 font-semibold tracking-wider">
+						<button
+							onClick={handleAdd}
+							className="h-full rounded-xl bg-[#FFA725] px-4 font-semibold tracking-wider text-black"
+						>
 							ADD
 						</button>
 					</div>

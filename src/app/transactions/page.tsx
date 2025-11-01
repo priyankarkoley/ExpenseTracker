@@ -147,7 +147,7 @@ export default function Transactions() {
 		: groupedTransactions[selectedMonth] || [];
 
 	return (
-		<div className='overflow-y-auto space-y-10'>
+		<div className="space-y-10 overflow-y-auto">
 			{/* Month Selector */}
 			<div className="flex justify-center py-2">
 				<Select value={selectedMonth} onValueChange={setSelectedMonth}>

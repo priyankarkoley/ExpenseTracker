@@ -13,7 +13,9 @@ function Footer() {
 				prefetch
 				href="/"
 				className={`w-full rounded-xl py-3 ${pathname === '/' ? 'cursor-not-allowed bg-gray-400' : 'bg-[#FFA725]'}`}
-				onClick={e => {if (pathname === '/') e.preventDefault()}}
+				onClick={e => {
+					if (pathname === '/') e.preventDefault();
+				}}
 			>
 				HOME
 			</Link>
@@ -21,7 +23,9 @@ function Footer() {
 				prefetch
 				href="/edit"
 				className={`w-full rounded-xl py-3 ${pathname === '/edit' ? 'cursor-not-allowed bg-gray-400' : 'bg-[#FFA725]'}`}
-				onClick={e => {if (pathname === '/edit') e.preventDefault()}}
+				onClick={e => {
+					if (pathname === '/edit') e.preventDefault();
+				}}
 			>
 				EDIT
 			</Link>
@@ -29,7 +33,9 @@ function Footer() {
 				prefetch
 				href="/transactions"
 				className={`w-full rounded-xl py-3 ${pathname === '/transactions' ? 'cursor-not-allowed bg-gray-400' : 'bg-[#FFA725]'}`}
-				onClick={e => {if (pathname === '/transactions') e.preventDefault()}}
+				onClick={e => {
+					if (pathname === '/transactions') e.preventDefault();
+				}}
 			>
 				TRANS
 			</Link>
