@@ -18,6 +18,10 @@ export default function Transactions() {
 	const [groupedTransactions, setGroupedTransactions] = useState<{ [key: string]: TransactionType[] }>({});
 	const [selectedMonth, setSelectedMonth] = useState<string>('');
 
+	// Add sort state
+	const [sortBy, setSortBy] = useState<'tag' | 'value'>('tag');
+	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
 	// Helper function to format date
 	const formatDate = (dateString: string) => {
 		const options: Intl.DateTimeFormatOptions = {
@@ -123,6 +127,17 @@ export default function Transactions() {
 	// compute total for the selected month
 	const monthTotal = Object.values(tagTotals).reduce((sum, v) => sum + v, 0);
 
+	// compute sorted entries for display
+	const sortedTagEntries = Object.entries(tagTotals).sort((a, b) => {
+		if (sortBy === 'tag') {
+			const cmp = a[0].localeCompare(b[0]);
+			return sortOrder === 'asc' ? cmp : -cmp;
+		}
+		// sortBy === 'value'
+		const cmp = a[1] - b[1];
+		return sortOrder === 'asc' ? cmp : -cmp;
+	});
+
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="h-[calc(88vh -.875rem)] space-y-10 overflow-y-auto">
@@ -134,7 +149,7 @@ export default function Transactions() {
 						</SelectTrigger>
 						<SelectContent className="bg-[#232323] text-xl">
 							{Object.keys(groupedTransactions).map(month => (
-								<SelectItem value={month}>{month}</SelectItem>
+								<SelectItem key={month}  value={month}>{month}</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
@@ -229,14 +244,37 @@ export default function Transactions() {
 					<div className="space-y-4 py-4">
 						{Object.keys(tagTotals).length > 0 ? (
 							<>
-								{/* Total row shown before individual tags */}
-								<div className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg">
-									<span className="text-xl">Total</span>
-									<span className="text-xl">{monthTotal.toFixed(2)}</span>
+								{/* Sort controls (added) */}
+								<div className="flex justify-center gap-3">
+									<Select value={sortBy} onValueChange={v => setSortBy(v as 'tag' | 'value')}>
+										<SelectTrigger className="bg-[#232323] px-3 py-2 text-sm">
+											<SelectValue placeholder="Sort by" />
+										</SelectTrigger>
+										<SelectContent className="bg-[#232323] text-sm">
+											<SelectItem value="tag">Tag (A–Z)</SelectItem>
+											<SelectItem value="value">Value</SelectItem>
+										</SelectContent>
+									</Select>
+
+									<Select value={sortOrder} onValueChange={v => setSortOrder(v as 'asc' | 'desc')}>
+										<SelectTrigger className="bg-[#232323] px-3 py-2 text-sm">
+											<SelectValue placeholder="Order" />
+										</SelectTrigger>
+										<SelectContent className="bg-[#232323] text-sm">
+											<SelectItem value="asc">Ascending</SelectItem>
+											<SelectItem value="desc">Descending</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
-								{/* Individual tag rows */}
-								{Object.entries(tagTotals).map(([tag, total]) => (
+								{/* Total row shown before individual tags */}
+								<div className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg">
+									<span className="text-xl underline">TOTAL</span>
+									<span className="text-xl underline">{monthTotal.toFixed(2)}</span>
+								</div>
+
+								{/* Individual tag rows (use sorted entries) */}
+								{sortedTagEntries.map(([tag, total]) => (
 									<div
 										key={tag}
 										className="flex items-center justify-between rounded-xl bg-[#FFA725] px-6 py-4 font-semibold text-black shadow-lg"
