@@ -68,6 +68,13 @@ export default function EditPage() {
 				<div className="max-h-1/3 space-y-2">
 					<div className="text-xl font-bold">Edit Tags</div>
 					<textarea
+						enterKeyHint='next'
+						onKeyDown={e => {
+							if (e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault();
+								(e.target as HTMLTextAreaElement).blur(); // 👈 closes the keyboard
+							}
+						}}
 						className="h-fit w-full rounded border p-2"
 						rows={(() => (tagsJSON.split(/\r\n|\r|\n/).length > 5 ? 5 : tagsJSON.split(/\r\n|\r|\n/).length))()}
 						value={tagsJSON}
@@ -77,6 +84,13 @@ export default function EditPage() {
 				<div className="h-full space-y-2 pb-10">
 					<div className="text-xl font-bold">Edit Transactions</div>
 					<textarea
+						enterKeyHint='done'
+						onKeyDown={e => {
+							if (e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault();
+								(e.target as HTMLTextAreaElement).blur(); // 👈 closes the keyboard
+							}
+						}}
 						className="h-full w-full rounded border p-2"
 						value={transactionsJSON}
 						onChange={e => setTransactionsJSON(e.target.value)}
