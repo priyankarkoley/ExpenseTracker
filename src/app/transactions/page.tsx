@@ -19,8 +19,11 @@ export default function Transactions() {
 	const [selectedMonth, setSelectedMonth] = useState<string>('');
 
 	// Add sort state
-	const [sortBy, setSortBy] = useState<'tag' | 'value'>('tag');
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [sortBy, setSortBy] = useState<'tag' | 'value'>('value');
+	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+	// State for selected filter tag
+	const [filterTag, setFilterTag] = useState<string | null>(null);
 
 	// Helper function to format date
 	const formatDate = (dateString: string) => {
@@ -138,6 +141,11 @@ export default function Transactions() {
 		return sortOrder === 'asc' ? cmp : -cmp;
 	});
 
+	// Filter transactions based on the selected tag
+	const filteredTransactions = filterTag
+		? (groupedTransactions[selectedMonth] || []).filter(transaction => transaction.tag === filterTag)
+		: groupedTransactions[selectedMonth] || [];
+
 	return (
 		<div className="flex h-[calc(88vh)] flex-col justify-between px-7 pt-8 pb-4">
 			<div className="h-[calc(88vh -.875rem)] space-y-10 overflow-y-auto">
@@ -149,15 +157,33 @@ export default function Transactions() {
 						</SelectTrigger>
 						<SelectContent className="bg-[#232323] text-xl">
 							{Object.keys(groupedTransactions).map(month => (
-								<SelectItem key={month}  value={month}>{month}</SelectItem>
+								<SelectItem key={month} value={month}>
+									{month}
+								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
 				</div>
 				<div className="space-y-1">
 					<div className="text-center text-3xl font-bold text-white">Recent Transactions</div>
+					{/* Filter by tag */}
+					<div className="mt-4 flex justify-center">
+						<Select value={filterTag || 'All'} onValueChange={value => setFilterTag(value === 'All' ? null : value)}>
+							<SelectTrigger className="bg-[#232323] px-5 py-3 text-sm">
+								<SelectValue placeholder="Filter by Tag" />
+							</SelectTrigger>
+							<SelectContent className="bg-[#232323] text-sm">
+								<SelectItem value="All">All</SelectItem>
+								{Object.keys(tagTotals).map(tag => (
+									<SelectItem key={tag} value={tag}>
+										{tag}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
 					<div className="space-y-4 py-3">
-						{selectedMonth && groupedTransactions[selectedMonth] && groupedTransactions[selectedMonth].length > 0 ? (
+						{selectedMonth && filteredTransactions.length > 0 ? (
 							<div className="space-y-2">
 								<div
 									className="cursor-pointer rounded-sm bg-[#41644A] px-4 py-2 font-bold"
@@ -171,7 +197,7 @@ export default function Transactions() {
 								{recentTransVisible &&
 									(() => {
 										// Group transactions by day (descending)
-										const transactions = groupedTransactions[selectedMonth] || [];
+										const transactions = filteredTransactions;
 										const groupedByDay: { [key: string]: TransactionType[] } = {};
 										transactions.forEach(tx => {
 											const dateObj = new Date(tx.date);
@@ -235,7 +261,7 @@ export default function Transactions() {
 									})()}
 							</div>
 						) : (
-							<div className="text-center text-lg text-gray-500">No recent transactions found</div>
+							<div className="text-center text-lg text-gray-500">No transactions found for the selected tag</div>
 						)}
 					</div>
 				</div>
